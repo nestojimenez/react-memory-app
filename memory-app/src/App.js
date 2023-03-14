@@ -4,6 +4,8 @@ import './App.css';
 
 function App() {
 
+const [aciertos, setAciertos] = useState(0);
+const [intentos, setIntentos] = useState(0);
 const cuadrosJuntos = [...cuadros, ...cuadros];
 
 const cuadrosPrevios = cuadrosJuntos.map(valor => ({
@@ -12,7 +14,7 @@ const cuadrosPrevios = cuadrosJuntos.map(valor => ({
 }));
 
 const [misCuadros, setMisCuadros] = useState([]);
-const [misTiradas, setMisTiraas] = useState([]);
+const [misTiradas, setMisTiradas] = useState([]);
 
 useEffect(()=>{
   
@@ -29,10 +31,44 @@ const tapado = {
 }
 
 const marcar = (index) => {
-  const prevItem = [...misCuadros];
-  prevItem[index].estado = 1
-  setMisCuadros(prevItem);
+
+  const existe = misTiradas.find(objeto => objeto.indice ===index); //Para no hacer click en el mismo
+  const yaEcontrada = misCuadros[index].estado;  //Para que no deje hacer click en uno ya encontrado
+
+  if(misTiradas.length < 2 && !existe){
+
+    setMisTiradas([...misTiradas, {
+      imagen: misCuadros[index].imagen,
+      indice: index
+    }]);
+    const prevItem = [...misCuadros];
+    prevItem[index].estado = 1;
+    setMisCuadros(prevItem);
+  }
+  
 }
+
+useEffect(() => {
+  if(misTiradas.length === 2){
+    setIntentos(intentos+1);
+    if(misTiradas[0].imagen === misTiradas[1].imagen){
+      setMisTiradas([]);
+      setAciertos(aciertos + 1);
+      if(aciertos + 1 >= cuadros.length){
+        alert('Has acabado el juego')
+      }
+    }else{
+      setTimeout(()=>{
+        misTiradas.map(objeto => {
+          const provisional = [...misCuadros];
+          provisional[objeto.indice].estado = 0;
+          setMisCuadros(provisional);
+          setMisTiradas([]);
+        })
+      },2000)
+    }
+  }
+}, [misTiradas])
 
 
   return (
@@ -51,7 +87,15 @@ const marcar = (index) => {
         </div>
       </div>)
     )}
+
+      <div className="aciertos">
+        {aciertos} aciertos de {intentos} intentos:
+        {(intentos > 0) && (Math.round(aciertos * 100 /intentos))} % de acierto
+      </div>
+
     </div>
+
+    
   );
 }
 
