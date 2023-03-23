@@ -6,6 +6,9 @@ function App() {
 
 const [aciertos, setAciertos] = useState(0);
 const [intentos, setIntentos] = useState(0);
+const [mensaje, setMensaje] = useState();
+const [finalizado, setFinalizado] = useState(false);
+
 const cuadrosJuntos = [...cuadros, ...cuadros];
 
 const cuadrosPrevios = cuadrosJuntos.map(valor => ({
@@ -35,7 +38,7 @@ const marcar = (index) => {
   const existe = misTiradas.find(objeto => objeto.indice ===index); //Para no hacer click en el mismo
   const yaEcontrada = misCuadros[index].estado;  //Para que no deje hacer click en uno ya encontrado
 
-  if(misTiradas.length < 2 && !existe){
+  if(misTiradas.length < 2 && !existe && yaEcontrada===0){
 
     setMisTiradas([...misTiradas, {
       imagen: misCuadros[index].imagen,
@@ -55,7 +58,8 @@ useEffect(() => {
       setMisTiradas([]);
       setAciertos(aciertos + 1);
       if(aciertos + 1 >= cuadros.length){
-        alert('Has acabado el juego')
+        setMensaje('Has acabado el juego');
+        setFinalizado(true);
       }
     }else{
       setTimeout(()=>{
@@ -72,6 +76,16 @@ useEffect(() => {
 
 
   return (
+    <>
+    {finalizado &&
+    <div className="panel">
+      <div className="texto">
+        <div className="mensaje">
+          {mensaje}
+        </div>
+        <button>Aceptar</button>
+      </div>
+    </div>}
     <div className="cuadros">
       {misCuadros.map((dato, index) => 
       (dato.estado === 0)
@@ -94,7 +108,7 @@ useEffect(() => {
       </div>
 
     </div>
-
+    </>
     
   );
 }
